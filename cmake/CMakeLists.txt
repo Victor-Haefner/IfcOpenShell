@@ -35,6 +35,7 @@ OPTION(BUILD_SHARED_LIBS "Build IfcParse and IfcGeom as shared libs (SO/DLL)." O
 # TODO QtViewer is deprecated ATM as it uses the 0.4 API
 # OPTION(BUILD_QTVIEWER "Build IfcOpenShell Qt GUI Viewer (requires Qt 4 framework)." OFF)
 
+set(CMAKE_CXX_STANDARD 11)
 
 # Specify where to install files
 IF(NOT BINDIR)

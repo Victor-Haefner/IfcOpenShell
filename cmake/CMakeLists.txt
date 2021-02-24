@@ -550,8 +550,9 @@ if(NOT MSVC)
             message(FATAL_ERROR "OCCT7 requires a compiler with C++11 support")
         endif()
     else()
-        add_definitions(-std=c++03)
+        add_definitions(-std=c++0x)
     endif()
+
 endif()
 
 set(IFCOPENSHELL_LIBRARIES IfcParse IfcGeom)
@@ -572,6 +573,10 @@ set(IFCPARSE_FILES ${IFCPARSE_CPP_FILES} ${IFCPARSE_H_FILES})
 
 add_library(IfcParse ${IFCPARSE_FILES})
 set_target_properties(IfcParse PROPERTIES COMPILE_FLAGS -DIFC_PARSE_EXPORTS)
+
+if (WIN32)
+	set(Boost_LIBRARIES ${Boost_LIBRARIES} bcrypt)
+endif()
 
 IF(UNICODE_SUPPORT)
 	TARGET_LINK_LIBRARIES(IfcParse ${ICU_LIBRARIES} ${Boost_LIBRARIES})

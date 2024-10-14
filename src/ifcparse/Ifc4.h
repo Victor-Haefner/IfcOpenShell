@@ -28365,19 +28365,17 @@ public:
     std::vector< std::vector< int > > CoordIndex() const;
     void setCoordIndex(std::vector< std::vector< int > > v);
     /// Whether the optional attribute NormalIndex is defined for this IfcPolygonalFaceSet
-    bool hasNormalIndex() const;
-    std::vector< std::vector< int > > NormalIndex() const;
-    void setNormalIndex(std::vector< std::vector< int > > v);
-    virtual unsigned int getArgumentCount() const { return 5; }
-    virtual IfcUtil::ArgumentType getArgumentType(unsigned int i) const { switch (i) {case 3: return IfcUtil::Argument_AGGREGATE_OF_AGGREGATE_OF_INT; case 4: return IfcUtil::Argument_AGGREGATE_OF_AGGREGATE_OF_INT; } return IfcTessellatedFaceSet::getArgumentType(i); }
-    virtual Type::Enum getArgumentEntity(unsigned int i) const { switch (i) {case 3: return Type::IfcPositiveInteger; case 4: return Type::IfcPositiveInteger; } return IfcTessellatedFaceSet::getArgumentEntity(i); }
-    virtual const char* getArgumentName(unsigned int i) const { switch (i) {case 3: return "CoordIndex"; case 4: return "NormalIndex"; } return IfcTessellatedFaceSet::getArgumentName(i); }
+    bool hasCoordIndex() const;
+    virtual unsigned int getArgumentCount() const { return 4; }
+    virtual IfcUtil::ArgumentType getArgumentType(unsigned int i) const { switch (i) {case 3: return IfcUtil::Argument_AGGREGATE_OF_AGGREGATE_OF_INT; } return IfcTessellatedFaceSet::getArgumentType(i); }
+    virtual Type::Enum getArgumentEntity(unsigned int i) const { switch (i) {case 3: return Type::IfcPositiveInteger; } return IfcTessellatedFaceSet::getArgumentEntity(i); }
+    virtual const char* getArgumentName(unsigned int i) const { switch (i) {case 3: return "CoordIndex"; } return IfcTessellatedFaceSet::getArgumentName(i); }
     virtual Argument* getArgument(unsigned int i) const { return entity->getArgument(i); }
     bool is(Type::Enum v) const;
     Type::Enum type() const;
     static Type::Enum Class();
     IfcPolygonalFaceSet (IfcEntityInstanceData* e);
-    IfcPolygonalFaceSet (IfcCartesianPointList3D* v1_Coordinates, boost::optional< std::vector< std::vector< double > > > v2_Normals, boost::optional< bool > v3_Closed, std::vector< std::vector< int > > v4_CoordIndex, boost::optional< std::vector< std::vector< int > > > v5_NormalIndex);
+    IfcPolygonalFaceSet (IfcCartesianPointList3D* v1_Coordinates, boost::optional< bool > v2_Closed, std::vector< std::vector< int > > v3_CoordIndex);
     typedef IfcTemplatedEntityList< IfcPolygonalFaceSet > list;
 };
 

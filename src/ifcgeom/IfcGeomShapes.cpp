@@ -1160,7 +1160,13 @@ bool IfcGeom::Kernel::convert(const IfcSchema::IfcPolygonalFaceSet* l, TopoDS_Sh
 		                        coords[2] * getValue(GV_LENGTH_UNIT)));
 	}
 
-	std::vector< std::vector<int> > indices = l->CoordIndex();
+	
+	std::vector< std::vector<int> > indices;
+	if (l->hasCoordIndex()) indices = l->CoordIndex();
+	else {
+		indices.push_back( std::vector<int>() );
+		for (int i=0; i<points.size(); i++) indices[0].push_back(i);
+	}
 	
 	std::vector<TopoDS_Face> faces;
 	faces.reserve(indices.size());

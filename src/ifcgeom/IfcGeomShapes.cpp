@@ -1171,20 +1171,22 @@ bool IfcGeom::Kernel::convert(const IfcSchema::IfcPolygonalFaceSet* l, TopoDS_Sh
 	std::vector<TopoDS_Face> faces;
 	faces.reserve(indices.size());
 
+	return false;
 	for(std::vector< std::vector<int> >::const_iterator it = indices.begin(); it != indices.end(); ++ it) {
 		const std::vector<int>& poly = *it;
 
 		const int min_index = *std::min_element(poly.begin(), poly.end());
 		const int max_index = *std::max_element(poly.begin(), poly.end());
 
-		if (min_index < 1 || max_index > (int) points.size()) {
+		if (min_index < 0 || max_index >= (int) points.size()) {
+			std::cout << " ---- Np " << points.size() << " min: " << min_index << " max: " << max_index << std::endl;
 			Logger::Message(Logger::LOG_ERROR, "Contents of CoordIndex out of bounds", l->entity);
 			return false;
 		}
 
 		BRepBuilderAPI_MakePolygon polygonMaker;
-		for (int i=0; i<points.size(); i++) {
-			polygonMaker.Add(points[i]);
+		for (int i=0; i<poly.size(); i++) {
+			polygonMaker.Add(points[poly[i]]);
 		}
 
 		TopoDS_Wire wire = polygonMaker.Wire();

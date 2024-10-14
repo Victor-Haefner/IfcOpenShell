@@ -1148,7 +1148,7 @@ bool IfcGeom::Kernel::convert(const IfcSchema::IfcTriangulatedFaceSet* l, TopoDS
 	return true;
 }
 
-bool IfcGeom::Kernel::convert(const IfcSchema::IfcPolygonalFaceSet* l, TopoDS_Shape& shape) {
+/*bool IfcGeom::Kernel::convert(const IfcSchema::IfcPolygonalFaceSet* l, TopoDS_Shape& shape) {
 	IfcSchema::IfcCartesianPointList3D* point_list = l->Coordinates();
 	const std::vector< std::vector<double> > coordinates = point_list->CoordList();
 	std::vector<gp_Pnt> points;
@@ -1246,6 +1246,6 @@ bool IfcGeom::Kernel::convert(const IfcSchema::IfcPolygonalFaceSet* l, TopoDS_Sh
 	}
 
 	return true;
-}
+}*/
 
 #endif

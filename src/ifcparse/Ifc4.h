@@ -28360,7 +28360,7 @@ public:
     typedef IfcTemplatedEntityList< IfcTransportElementType > list;
 };
 
-class IFC_PARSE_API IfcPolygonalFaceSet : public IfcTessellatedFaceSet {
+/*class IFC_PARSE_API IfcPolygonalFaceSet : public IfcTessellatedFaceSet {
 public:
     std::vector< std::vector< int > > CoordIndex() const;
     void setCoordIndex(std::vector< std::vector< int > > v);
@@ -28379,7 +28379,7 @@ public:
     IfcPolygonalFaceSet (IfcEntityInstanceData* e);
     IfcPolygonalFaceSet (IfcCartesianPointList3D* v1_Coordinates, boost::optional< std::vector< std::vector< double > > > v2_Normals, boost::optional< bool > v3_Closed, std::vector< std::vector< int > > v4_CoordIndex, boost::optional< std::vector< std::vector< int > > > v5_NormalIndex);
     typedef IfcTemplatedEntityList< IfcPolygonalFaceSet > list;
-};
+};*/
 
 class IFC_PARSE_API IfcTriangulatedFaceSet : public IfcTessellatedFaceSet {
 public:

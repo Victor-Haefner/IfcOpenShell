@@ -98,6 +98,9 @@ Argument* IfcUtil::IfcBaseType::getArgument(unsigned int i) const { return entit
 const char* IfcUtil::IfcBaseType::getArgumentName(unsigned int i) const { if (i == 0) { return "wrappedValue"; } else { throw IfcParse::IfcAttributeOutOfRangeException("Argument index out of range"); } }
 
 
+//#include "../backtrace.h"
+//printBacktrace();
+
 //Note: some of these methods are overloaded in derived classes
 Argument::operator int() const { throw IfcParse::IfcException("Argument is not an integer"); }
 Argument::operator bool() const { throw IfcParse::IfcException("Argument is not a boolean"); }

@@ -9026,7 +9026,10 @@ IfcPlane* IfcCurveBoundedPlane::BasisSurface() const { return (IfcPlane*)((IfcUt
 void IfcCurveBoundedPlane::setBasisSurface(IfcPlane* v) { {IfcWrite::IfcWriteArgument* attr = new IfcWrite::IfcWriteArgument();attr->set(v);entity->setArgument(0,attr);} }
 IfcCurve* IfcCurveBoundedPlane::OuterBoundary() const { return (IfcCurve*)((IfcUtil::IfcBaseClass*)(*entity->getArgument(1))); }
 void IfcCurveBoundedPlane::setOuterBoundary(IfcCurve* v) { {IfcWrite::IfcWriteArgument* attr = new IfcWrite::IfcWriteArgument();attr->set(v);entity->setArgument(1,attr);} }
-IfcTemplatedEntityList< IfcCurve >::ptr IfcCurveBoundedPlane::InnerBoundaries() const { IfcEntityList::ptr es = *entity->getArgument(2); return es->as<IfcCurve>(); }
+IfcTemplatedEntityList< IfcCurve >::ptr IfcCurveBoundedPlane::InnerBoundaries() const {
+	if (entity->getArgument(2)->isNull()) return IfcTemplatedEntityList<IfcCurve>::ptr( new IfcTemplatedEntityList< IfcCurve >() );
+	else { IfcEntityList::ptr es = *entity->getArgument(2); return es->as<IfcCurve>(); }
+}
 void IfcCurveBoundedPlane::setInnerBoundaries(IfcTemplatedEntityList< IfcCurve >::ptr v) { {IfcWrite::IfcWriteArgument* attr = new IfcWrite::IfcWriteArgument();attr->set(v->generalize());entity->setArgument(2,attr);} }
 bool IfcCurveBoundedPlane::is(Type::Enum v) const { return v == Type::IfcCurveBoundedPlane || IfcBoundedSurface::is(v); }
 Type::Enum IfcCurveBoundedPlane::type() const { return Type::IfcCurveBoundedPlane; }

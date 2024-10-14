@@ -1803,6 +1803,9 @@ IfcEntityList::ptr IfcFile::entitiesByReference(int t) {
 	return return_value;
 }
 
+//#include "../backtrace.h"
+//printBacktrace();
+
 IfcUtil::IfcBaseClass* IfcFile::entityById(int id) {
 	entity_by_id_t::const_iterator it = byid.find(id);
 	if (it == byid.end()) {

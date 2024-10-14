@@ -25241,6 +25241,8 @@ public:
 /// IfcRelDefinesByType.
 class IFC_PARSE_API IfcRelDefines : public IfcRelationship {
 public:
+    IfcTemplatedEntityList< IfcObject >::ptr RelatedObjects() const;
+    void setRelatedObjects(IfcTemplatedEntityList< IfcObject >::ptr v);
     virtual unsigned int getArgumentCount() const { return 4; }
     virtual IfcUtil::ArgumentType getArgumentType(unsigned int i) const { return IfcRelationship::getArgumentType(i); }
     virtual Type::Enum getArgumentEntity(unsigned int i) const { return IfcRelationship::getArgumentEntity(i); }
@@ -26067,6 +26069,8 @@ public:
     /// Reference to one spaces that is delimited by this boundary.
     IfcSpaceBoundarySelect* RelatingSpace() const;
     void setRelatingSpace(IfcSpaceBoundarySelect* v);
+    /// Whether the optional attribute RelatedBuildingElement is defined for this IfcRelSpaceBoundary
+    bool hasRelatedBuildingElement() const;
     /// Reference to Building Element, that defines the Space Boundaries.
     /// 
     /// IFC2x PLATFORM CHANGE  The data type has been changed from IfcBuildingElement to IfcElement with upward compatibility for file based exchange.
@@ -28354,6 +28358,27 @@ public:
     IfcTransportElementType (IfcEntityInstanceData* e);
     IfcTransportElementType (std::string v1_GlobalId, IfcOwnerHistory* v2_OwnerHistory, boost::optional< std::string > v3_Name, boost::optional< std::string > v4_Description, boost::optional< std::string > v5_ApplicableOccurrence, boost::optional< IfcTemplatedEntityList< IfcPropertySetDefinition >::ptr > v6_HasPropertySets, boost::optional< IfcTemplatedEntityList< IfcRepresentationMap >::ptr > v7_RepresentationMaps, boost::optional< std::string > v8_Tag, boost::optional< std::string > v9_ElementType, IfcTransportElementTypeEnum::IfcTransportElementTypeEnum v10_PredefinedType);
     typedef IfcTemplatedEntityList< IfcTransportElementType > list;
+};
+
+class IFC_PARSE_API IfcPolygonalFaceSet : public IfcTessellatedFaceSet {
+public:
+    std::vector< std::vector< int > > CoordIndex() const;
+    void setCoordIndex(std::vector< std::vector< int > > v);
+    /// Whether the optional attribute NormalIndex is defined for this IfcPolygonalFaceSet
+    bool hasNormalIndex() const;
+    std::vector< std::vector< int > > NormalIndex() const;
+    void setNormalIndex(std::vector< std::vector< int > > v);
+    virtual unsigned int getArgumentCount() const { return 5; }
+    virtual IfcUtil::ArgumentType getArgumentType(unsigned int i) const { switch (i) {case 3: return IfcUtil::Argument_AGGREGATE_OF_AGGREGATE_OF_INT; case 4: return IfcUtil::Argument_AGGREGATE_OF_AGGREGATE_OF_INT; } return IfcTessellatedFaceSet::getArgumentType(i); }
+    virtual Type::Enum getArgumentEntity(unsigned int i) const { switch (i) {case 3: return Type::IfcPositiveInteger; case 4: return Type::IfcPositiveInteger; } return IfcTessellatedFaceSet::getArgumentEntity(i); }
+    virtual const char* getArgumentName(unsigned int i) const { switch (i) {case 3: return "CoordIndex"; case 4: return "NormalIndex"; } return IfcTessellatedFaceSet::getArgumentName(i); }
+    virtual Argument* getArgument(unsigned int i) const { return entity->getArgument(i); }
+    bool is(Type::Enum v) const;
+    Type::Enum type() const;
+    static Type::Enum Class();
+    IfcPolygonalFaceSet (IfcEntityInstanceData* e);
+    IfcPolygonalFaceSet (IfcCartesianPointList3D* v1_Coordinates, boost::optional< std::vector< std::vector< double > > > v2_Normals, boost::optional< bool > v3_Closed, std::vector< std::vector< int > > v4_CoordIndex, boost::optional< std::vector< std::vector< int > > > v5_NormalIndex);
+    typedef IfcTemplatedEntityList< IfcPolygonalFaceSet > list;
 };
 
 class IFC_PARSE_API IfcTriangulatedFaceSet : public IfcTessellatedFaceSet {

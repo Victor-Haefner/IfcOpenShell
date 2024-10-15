@@ -602,6 +602,7 @@ IfcUtil::IfcBaseClass* Ifc4::SchemaEntity(IfcEntityInstanceData* e) {
         case Type::IfcPolyLoop: return new IfcPolyLoop(e); break;
         case Type::IfcPolygonalBoundedHalfSpace: return new IfcPolygonalBoundedHalfSpace(e); break;
         case Type::IfcPolygonalFaceSet: return new IfcPolygonalFaceSet(e); break;
+        case Type::IfcIndexedPolygonalFace: return new IfcIndexedPolygonalFace(e); break;
         case Type::IfcPolyline: return new IfcPolyline(e); break;
         case Type::IfcPort: return new IfcPort(e); break;
         case Type::IfcPostalAddress: return new IfcPostalAddress(e); break;

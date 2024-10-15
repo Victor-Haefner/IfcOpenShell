@@ -1160,18 +1160,16 @@ bool IfcGeom::Kernel::convert(const IfcSchema::IfcPolygonalFaceSet* l, TopoDS_Sh
 		                        coords[2] * getValue(GV_LENGTH_UNIT)));
 	}
 
-	std::cout << "  IfcGeom::Kernel::convert IfcPolygonalFaceSet " << l->id() << std::endl;
+	//std::cout << "  -------------- IfcGeom::Kernel::convert IfcPolygonalFaceSet " << l->id() << std::endl;
 	std::vector< std::vector<int> > indices;
 	if (l->hasCoordIndex()) indices = l->CoordIndex();
 	else {
 		IfcSchema::IfcIndexedPolygonalFace::list faces = *l->Faces();
 		for(auto it = faces.begin(); it != faces.end(); ++ it) {
-		//for (int i=0; i<faces.size(); i++) {
-			//auto face = faces[i];
 			auto face = *it;
 			auto coords = face->CoordIndex();
-			std::cout << "   face " << face->id() << std::endl;
-			for (auto c : coords) std::cout << "    index " << c << std::endl;
+			//std::cout << "   face " << face->id() << std::endl;
+			//for (auto c : coords) std::cout << "    index " << c << ", " << points[c].X() << ", " << points[c].Y() << ", " << points[c].Z() << std::endl;
 			indices.push_back( coords );
 		}
 	}
@@ -1183,8 +1181,9 @@ bool IfcGeom::Kernel::convert(const IfcSchema::IfcPolygonalFaceSet* l, TopoDS_Sh
 		Logger::Message(Logger::LOG_ERROR, "No faces provided!", l->entity);
 		return false;
 	}
-		
-	for(std::vector< std::vector<int> >::const_iterator it = indices.begin(); it != indices.end(); ++ it) {
+	
+	int fi = 0;	
+	for(std::vector< std::vector<int> >::const_iterator it = indices.begin(); it != indices.end(); ++ it, fi++) {
 		const std::vector<int>& poly = *it;
 
 		const int min_index = *std::min_element(poly.begin(), poly.end());
@@ -1195,14 +1194,14 @@ bool IfcGeom::Kernel::convert(const IfcSchema::IfcPolygonalFaceSet* l, TopoDS_Sh
 			return false;
 		}
 
-		if (min_index < 0 || max_index >= (int) points.size()) {
+		if (min_index < 1 || max_index > (int) points.size()) {
 			Logger::Message(Logger::LOG_ERROR, "Contents of CoordIndex out of bounds", l->entity);
 			return false;
 		}
 
 		BRepBuilderAPI_MakePolygon polygonMaker;
 		for (int i=0; i<poly.size(); i++) {
-			polygonMaker.Add(points[poly[i]]);
+			polygonMaker.Add(points[poly[i]-1]);
 		}
 		polygonMaker.Close();
 
@@ -1217,12 +1216,15 @@ bool IfcGeom::Kernel::convert(const IfcSchema::IfcPolygonalFaceSet* l, TopoDS_Sh
 		}*/
 
 		if (face_area(face) > getValue(GV_MINIMAL_FACE_AREA)) {
+			//std::cout << " face " << fi << " area: " << face_area(face) << ", Np: " << poly.size() << std::endl;
 			faces.push_back(face);
 		} else {
-			std::cout << " face area: " << face_area(face) << ", Np: " << poly.size() << std::endl;
+			//std::cout << " face " << fi << " area: " << face_area(face) << ", Np: " << poly.size() << std::endl;
 			Logger::Message(Logger::LOG_ERROR, "Ignore face, too small", l->entity);
 		}
 	}
+	
+	//std::cout << "  -------------- " << std::endl;
 
 	if (faces.empty()) {
 		Logger::Message(Logger::LOG_ERROR, "No faces", l->entity);

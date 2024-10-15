@@ -28360,22 +28360,41 @@ public:
     typedef IfcTemplatedEntityList< IfcTransportElementType > list;
 };
 
+class IFC_PARSE_API IfcIndexedPolygonalFace : public IfcGeometricRepresentationItem {
+public:
+    std::vector< int > CoordIndex() const;
+    void setCoordIndex(std::vector< int > v);
+    virtual unsigned int getArgumentCount() const { return 1; }
+    virtual IfcUtil::ArgumentType getArgumentType(unsigned int i) const { return IfcUtil::Argument_AGGREGATE_OF_INT; }
+    virtual Type::Enum getArgumentEntity(unsigned int i) const { return Type::IfcPositiveInteger; }
+    virtual const char* getArgumentName(unsigned int i) const { return "CoordIndex"; }
+    virtual Argument* getArgument(unsigned int i) const { return entity->getArgument(i); }
+    bool is(Type::Enum v) const;
+    Type::Enum type() const;
+    static Type::Enum Class();
+    IfcIndexedPolygonalFace (IfcEntityInstanceData* e);
+    IfcIndexedPolygonalFace (std::vector< int > v1_CoordIndex);
+    typedef IfcTemplatedEntityList< IfcIndexedPolygonalFace > list;
+};
+
 class IFC_PARSE_API IfcPolygonalFaceSet : public IfcTessellatedFaceSet {
 public:
     std::vector< std::vector< int > > CoordIndex() const;
+    IfcTemplatedEntityList< IfcIndexedPolygonalFace >::ptr Faces() const;
+    
     void setCoordIndex(std::vector< std::vector< int > > v);
     /// Whether the optional attribute NormalIndex is defined for this IfcPolygonalFaceSet
     bool hasCoordIndex() const;
     virtual unsigned int getArgumentCount() const { return 4; }
-    virtual IfcUtil::ArgumentType getArgumentType(unsigned int i) const { switch (i) {case 3: return IfcUtil::Argument_AGGREGATE_OF_AGGREGATE_OF_INT; } return IfcTessellatedFaceSet::getArgumentType(i); }
-    virtual Type::Enum getArgumentEntity(unsigned int i) const { switch (i) {case 3: return Type::IfcPositiveInteger; } return IfcTessellatedFaceSet::getArgumentEntity(i); }
-    virtual const char* getArgumentName(unsigned int i) const { switch (i) {case 3: return "CoordIndex"; } return IfcTessellatedFaceSet::getArgumentName(i); }
+    virtual IfcUtil::ArgumentType getArgumentType(unsigned int i) const { switch (i) {case 2: return IfcUtil::Argument_AGGREGATE_OF_ENTITY_INSTANCE; case 3: return IfcUtil::Argument_AGGREGATE_OF_AGGREGATE_OF_INT; } return IfcTessellatedFaceSet::getArgumentType(i); }
+    virtual Type::Enum getArgumentEntity(unsigned int i) const { switch (i) {case 2: return Type::IfcIndexedPolygonalFace; case 3: return Type::IfcPositiveInteger; } return IfcTessellatedFaceSet::getArgumentEntity(i); }
+    virtual const char* getArgumentName(unsigned int i) const { switch (i) {case 2: return "Faces"; case 3: return "CoordIndex"; } return IfcTessellatedFaceSet::getArgumentName(i); }
     virtual Argument* getArgument(unsigned int i) const { return entity->getArgument(i); }
     bool is(Type::Enum v) const;
     Type::Enum type() const;
     static Type::Enum Class();
     IfcPolygonalFaceSet (IfcEntityInstanceData* e);
-    IfcPolygonalFaceSet (IfcCartesianPointList3D* v1_Coordinates, boost::optional< bool > v2_Closed, std::vector< std::vector< int > > v3_CoordIndex);
+    IfcPolygonalFaceSet (IfcCartesianPointList3D* v1_Coordinates, boost::optional< bool > v2_Closed, IfcTemplatedEntityList< IfcIndexedPolygonalFace >::ptr v3_Faces, std::vector< std::vector< int > > v4_CoordIndex);
     typedef IfcTemplatedEntityList< IfcPolygonalFaceSet > list;
 };
 

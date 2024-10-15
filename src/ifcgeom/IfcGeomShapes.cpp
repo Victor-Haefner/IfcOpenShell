@@ -1160,26 +1160,42 @@ bool IfcGeom::Kernel::convert(const IfcSchema::IfcPolygonalFaceSet* l, TopoDS_Sh
 		                        coords[2] * getValue(GV_LENGTH_UNIT)));
 	}
 
-	
+	std::cout << "  IfcGeom::Kernel::convert IfcPolygonalFaceSet " << l->id() << std::endl;
 	std::vector< std::vector<int> > indices;
 	if (l->hasCoordIndex()) indices = l->CoordIndex();
 	else {
-		indices.push_back( std::vector<int>() );
-		for (int i=0; i<points.size(); i++) indices[0].push_back(i);
+		IfcSchema::IfcIndexedPolygonalFace::list faces = *l->Faces();
+		for(auto it = faces.begin(); it != faces.end(); ++ it) {
+		//for (int i=0; i<faces.size(); i++) {
+			//auto face = faces[i];
+			auto face = *it;
+			auto coords = face->CoordIndex();
+			std::cout << "   face " << face->id() << std::endl;
+			for (auto c : coords) std::cout << "    index " << c << std::endl;
+			indices.push_back( coords );
+		}
 	}
 	
 	std::vector<TopoDS_Face> faces;
 	faces.reserve(indices.size());
 
-	return false;
+	if (indices.size() < 0) {
+		Logger::Message(Logger::LOG_ERROR, "No faces provided!", l->entity);
+		return false;
+	}
+		
 	for(std::vector< std::vector<int> >::const_iterator it = indices.begin(); it != indices.end(); ++ it) {
 		const std::vector<int>& poly = *it;
 
 		const int min_index = *std::min_element(poly.begin(), poly.end());
 		const int max_index = *std::max_element(poly.begin(), poly.end());
+		
+		if (poly.size() < 3) {
+			Logger::Message(Logger::LOG_ERROR, "Length of CoordIndex less than 3", l->entity);
+			return false;
+		}
 
 		if (min_index < 0 || max_index >= (int) points.size()) {
-			std::cout << " ---- Np " << points.size() << " min: " << min_index << " max: " << max_index << std::endl;
 			Logger::Message(Logger::LOG_ERROR, "Contents of CoordIndex out of bounds", l->entity);
 			return false;
 		}
@@ -1188,23 +1204,30 @@ bool IfcGeom::Kernel::convert(const IfcSchema::IfcPolygonalFaceSet* l, TopoDS_Sh
 		for (int i=0; i<poly.size(); i++) {
 			polygonMaker.Add(points[poly[i]]);
 		}
+		polygonMaker.Close();
 
 		TopoDS_Wire wire = polygonMaker.Wire();
 		TopoDS_Face face = BRepBuilderAPI_MakeFace(wire).Face();
 
-		TopoDS_Iterator face_it(face, false);
+		/*TopoDS_Iterator face_it(face, false);
 		const TopoDS_Wire& w = TopoDS::Wire(face_it.Value());
 		const bool reversed = w.Orientation() == TopAbs_REVERSED;
 		if (reversed) {
 			face.Reverse();
-		}
+		}*/
 
 		if (face_area(face) > getValue(GV_MINIMAL_FACE_AREA)) {
 			faces.push_back(face);
+		} else {
+			std::cout << " face area: " << face_area(face) << ", Np: " << poly.size() << std::endl;
+			Logger::Message(Logger::LOG_ERROR, "Ignore face, too small", l->entity);
 		}
 	}
 
-	if (faces.empty()) return false;
+	if (faces.empty()) {
+		Logger::Message(Logger::LOG_ERROR, "No faces", l->entity);
+		return false;
+	}
 	
 	bool valid_shell = false;
 

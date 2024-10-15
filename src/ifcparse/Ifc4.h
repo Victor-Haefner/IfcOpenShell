@@ -28377,6 +28377,23 @@ public:
     typedef IfcTemplatedEntityList< IfcIndexedPolygonalFace > list;
 };
 
+class IFC_PARSE_API IfcIndexedPolygonalFaceWithVoids : public IfcIndexedPolygonalFace {
+public:
+    std::vector< std::vector< int > > Voids() const;
+    void setVoids(std::vector< std::vector< int > > v);
+    virtual unsigned int getArgumentCount() const { return 2; }
+    virtual IfcUtil::ArgumentType getArgumentType(unsigned int i) const { switch (i) {case 0: return IfcUtil::Argument_AGGREGATE_OF_INT; case 1: return IfcUtil::Argument_AGGREGATE_OF_AGGREGATE_OF_INT; } }
+    virtual Type::Enum getArgumentEntity(unsigned int i) const { return Type::IfcPositiveInteger; }
+    virtual const char* getArgumentName(unsigned int i) const { switch (i) {case 0: return "CoordIndex"; case 1: return "Voids"; }; }
+    virtual Argument* getArgument(unsigned int i) const { return entity->getArgument(i); }
+    bool is(Type::Enum v) const;
+    Type::Enum type() const;
+    static Type::Enum Class();
+    IfcIndexedPolygonalFaceWithVoids (IfcEntityInstanceData* e);
+    IfcIndexedPolygonalFaceWithVoids (std::vector< int > v1_CoordIndex, std::vector< std::vector< int > > v2_Voids);
+    typedef IfcTemplatedEntityList< IfcIndexedPolygonalFaceWithVoids > list;
+};
+
 class IFC_PARSE_API IfcPolygonalFaceSet : public IfcTessellatedFaceSet {
 public:
     std::vector< std::vector< int > > CoordIndex() const;

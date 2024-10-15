@@ -1159,32 +1159,17 @@ bool IfcGeom::Kernel::convert(const IfcSchema::IfcPolygonalFaceSet* l, TopoDS_Sh
 		                        coords[1] * getValue(GV_LENGTH_UNIT),
 		                        coords[2] * getValue(GV_LENGTH_UNIT)));
 	}
+	
+	// TODO: check if IfcIndexedPolygonalFaceWithVoids are handled correctly
 
-	//std::cout << "  -------------- IfcGeom::Kernel::convert IfcPolygonalFaceSet " << l->id() << std::endl;
+	std::vector<TopoDS_Face> brepFaces;
 	std::vector< std::vector<int> > indices;
 	if (l->hasCoordIndex()) indices = l->CoordIndex();
-	else {
-		IfcSchema::IfcIndexedPolygonalFace::list faces = *l->Faces();
-		for(auto it = faces.begin(); it != faces.end(); ++ it) {
-			auto face = *it;
-			auto coords = face->CoordIndex();
-			//std::cout << "   face " << face->id() << std::endl;
-			//for (auto c : coords) std::cout << "    index " << c << ", " << points[c].X() << ", " << points[c].Y() << ", " << points[c].Z() << std::endl;
-			indices.push_back( coords );
-		}
-	}
 	
-	std::vector<TopoDS_Face> faces;
-	faces.reserve(indices.size());
-
-	if (indices.size() < 0) {
-		Logger::Message(Logger::LOG_ERROR, "No faces provided!", l->entity);
-		return false;
-	}
-	
-	int fi = 0;	
-	for(std::vector< std::vector<int> >::const_iterator it = indices.begin(); it != indices.end(); ++ it, fi++) {
-		const std::vector<int>& poly = *it;
+	IfcSchema::IfcIndexedPolygonalFace::list faces = *l->Faces();
+	for(auto it = faces.begin(); it != faces.end(); ++ it) {
+		auto face = *it;
+		const std::vector<int>& poly = face->CoordIndex();
 
 		const int min_index = *std::min_element(poly.begin(), poly.end());
 		const int max_index = *std::max_element(poly.begin(), poly.end());
@@ -1204,42 +1189,44 @@ bool IfcGeom::Kernel::convert(const IfcSchema::IfcPolygonalFaceSet* l, TopoDS_Sh
 			polygonMaker.Add(points[poly[i]-1]);
 		}
 		polygonMaker.Close();
-
 		TopoDS_Wire wire = polygonMaker.Wire();
-		TopoDS_Face face = BRepBuilderAPI_MakeFace(wire).Face();
+		
+		BRepBuilderAPI_MakeFace faceMaker(wire);
+		if (l->is(IfcSchema::Type::IfcIndexedPolygonalFaceWithVoids)) {
+			const auto& voids = ((IfcSchema::IfcIndexedPolygonalFaceWithVoids*)l)->Voids();
+			for (auto& v : voids) {
+				BRepBuilderAPI_MakePolygon polygonMakerV;
+				for (int i=0; i<v.size(); i++) {
+					polygonMakerV.Add(points[v[i]-1]);
+				}
+				polygonMakerV.Close();
+				faceMaker.Add( polygonMakerV.Wire() );
+			}
+		}
+		TopoDS_Face brepFace = faceMaker.Face();
 
-		/*TopoDS_Iterator face_it(face, false);
-		const TopoDS_Wire& w = TopoDS::Wire(face_it.Value());
-		const bool reversed = w.Orientation() == TopAbs_REVERSED;
-		if (reversed) {
-			face.Reverse();
-		}*/
-
-		if (face_area(face) > getValue(GV_MINIMAL_FACE_AREA)) {
-			//std::cout << " face " << fi << " area: " << face_area(face) << ", Np: " << poly.size() << std::endl;
-			faces.push_back(face);
+		if (face_area(brepFace) > getValue(GV_MINIMAL_FACE_AREA)) {
+			brepFaces.push_back(brepFace);
 		} else {
-			//std::cout << " face " << fi << " area: " << face_area(face) << ", Np: " << poly.size() << std::endl;
 			Logger::Message(Logger::LOG_ERROR, "Ignore face, too small", l->entity);
 		}
 	}
 	
-	//std::cout << "  -------------- " << std::endl;
 
-	if (faces.empty()) {
+	if (brepFaces.empty()) {
 		Logger::Message(Logger::LOG_ERROR, "No faces", l->entity);
 		return false;
 	}
 	
 	bool valid_shell = false;
 
-	if (faces.size() < getValue(GV_MAX_FACES_TO_SEW)) {
+	if (brepFaces.size() < getValue(GV_MAX_FACES_TO_SEW)) {
 		BRepOffsetAPI_Sewing builder;
 		builder.SetTolerance(getValue(GV_POINT_EQUALITY_TOLERANCE));
 		builder.SetMaxTolerance(getValue(GV_POINT_EQUALITY_TOLERANCE));
 		builder.SetMinTolerance(getValue(GV_POINT_EQUALITY_TOLERANCE));
 		
-		for (std::vector<TopoDS_Face>::const_iterator it = faces.begin(); it != faces.end(); ++it) {
+		for (std::vector<TopoDS_Face>::const_iterator it = brepFaces.begin(); it != brepFaces.end(); ++it) {
 			builder.Add(*it);
 		}
 
@@ -1271,7 +1258,7 @@ bool IfcGeom::Kernel::convert(const IfcSchema::IfcPolygonalFaceSet* l, TopoDS_Sh
 		BRep_Builder builder;
 		builder.MakeCompound(compound);
 		
-		for (std::vector<TopoDS_Face>::const_iterator it = faces.begin(); it != faces.end(); ++it) {
+		for (std::vector<TopoDS_Face>::const_iterator it = brepFaces.begin(); it != brepFaces.end(); ++it) {
 			builder.Add(compound, *it);
 		}
 

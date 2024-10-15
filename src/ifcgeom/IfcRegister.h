@@ -104,9 +104,6 @@ FACE(IfcDerivedProfileDef);
 // IfcFaceSurface included
 // IfcAdvancedFace included in case of IFC4
 FACE(IfcFace);
-//#ifdef USE_IFC4
-//FACE(IfcIndexedPolygonalFace);
-//#endif
 
 
 WIRE(IfcEdgeCurve);
